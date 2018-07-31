@@ -1,0 +1,11 @@
+html
+  head
+    title
+    
+  body
+    h2= message
+    
+    form(method ="post", action="/users/create")
+      input(type="text", name="nome")
+      input(type="text", name="sobrenome")
+      input(type="submit", value="save")
