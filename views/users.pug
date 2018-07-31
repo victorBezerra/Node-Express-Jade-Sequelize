@@ -1,0 +1,17 @@
+html
+  head
+    title
+    
+  body
+    h2= message
+    
+    table
+      thead
+       tr
+         th nome
+         th sobrenome
+      tbody
+        each obj in data
+          tr
+            td= obj.nome
+            td= obj.sobrenome
