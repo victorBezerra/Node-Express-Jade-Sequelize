@@ -1,8 +1,10 @@
 const express = require('express');
 const app = express();
-const Sequelize = require('sequelize');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const user = require('./models/user')
+const books =  require('./routes/books');
+
 
 app.set('view engine', 'pug');
 app.use(bodyParser.urlencoded({entended: false}));
@@ -15,18 +17,19 @@ app.use(methodOverride((req,res)=>{
   }
 }));
 
-// criando a conexão com o mysql
-var sequelize = new Sequelize('mysql://root@localhost:3306/expressjm');
 
-// Criando tabela com sequelize
-var User = sequelize.define('usuarios',{
-  nome: {
-    type: Sequelize.STRING
-  },
-  sobrenome: {
-    type: Sequelize.STRING
-  }
-});
+// criando a conexão com o mysql
+// var sequelize = new Sequelize('mysql://root@localhost:3306/expressjm');
+
+// // Criando tabela com sequelize
+// var User = sequelize.define('usuarios',{
+//   nome: {
+//     type: Sequelize.STRING
+//   },
+//   sobrenome: {
+//     type: Sequelize.STRING
+//   }
+// });
 
 // Criando usuário
 // User.sync()
@@ -45,7 +48,7 @@ app.get('/users/create', (req, res)=>{
 });
 
 app.post('/users/create',(req,res)=>{
-  User.create(req.body)
+  user.create(req.body)
     .then(()=>{
       res.render('newUsers',{
         message: 'Criando um usuário'
@@ -58,7 +61,7 @@ app.post('/users/create',(req,res)=>{
 
 // Select com todos os dados da tabela
 app.get('/users',(req, res)=>{
-  User.findAll()
+  user.findAll()
     .then((result)=>{
       res.render('users',{
         message: 'Lista de usuários',
@@ -78,7 +81,7 @@ app.get('/users/:id', (req,res)=>{
   //   }
   // })
   //OU função BYID()
-  User.findById(req.params.id)
+  user.findById(req.params.id)
     .then((result)=>{
       res.render('user',{
         data: result,
@@ -92,7 +95,7 @@ app.get('/users/:id', (req,res)=>{
 
 //Uma forma de deletar
 app.post('/users/:id', (req,res)=>{
-  User.destroy({
+  user.destroy({
     where:{
       id: req.params.id
     }
@@ -108,7 +111,7 @@ app.post('/users/:id', (req,res)=>{
 
 //Outra forma usando app.delete() do expressj
 app.delete('/users/:id', (req,res)=>{
-  User.destroy({
+  user.destroy({
     where:{
       id: req.params.id
     }
@@ -123,7 +126,7 @@ app.delete('/users/:id', (req,res)=>{
 
 //update
 app.get('/users/edit/:id', (req,res)=>{
-  User.findById(req.params.id)
+  user.findById(req.params.id)
     .then((result)=>{
       res.render('edit_users',{
         message: 'Editando usuário',
@@ -136,7 +139,7 @@ app.get('/users/edit/:id', (req,res)=>{
 });
 
 app.post('/users/edit/:id',(req,res)=>{
-  User.update(req.body,{
+  user.update(req.body,{
     where:{
       id: req.params.id
     }
