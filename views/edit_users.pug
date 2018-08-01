@@ -1,0 +1,11 @@
+html
+  head
+    title
+    
+  body
+    h2= message
+    
+    form(method ="post", action="/users/edit/"+data.id)
+      input(type="text", name="nome" value=data.nome)
+      input(type="text", name="sobrenome" value=data.sobrenome)
+      input(type="submit", value="save")

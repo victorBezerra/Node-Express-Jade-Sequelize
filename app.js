@@ -2,10 +2,18 @@ const express = require('express');
 const app = express();
 const Sequelize = require('sequelize');
 const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
 
 app.set('view engine', 'pug');
 app.use(bodyParser.urlencoded({entended: false}));
 app.use(bodyParser.json());
+app.use(methodOverride((req,res)=>{
+  if(req.body && req.body=='object' && '_method' in req.body){
+    var method = req.body._method;
+    delete req.body._method;
+    return method;
+  }
+}));
 
 // criando a conexão com o mysql
 var sequelize = new Sequelize('mysql://root@localhost:3306/expressjm');
@@ -28,6 +36,25 @@ var User = sequelize.define('usuarios',{
 //       sobrenome: 'Bezerra'
 //     });
 //   });
+
+// Adicionando usuário na tabela
+app.get('/users/create', (req, res)=>{
+  res.render('newUsers',{
+    message: 'Criando um usuário'
+  });
+});
+
+app.post('/users/create',(req,res)=>{
+  User.create(req.body)
+    .then(()=>{
+      res.render('newUsers',{
+        message: 'Criando um usuário'
+      });
+    })
+    .catch((err)=>{
+      console.log("ERRO: ", err);
+    })
+});
 
 // Select com todos os dados da tabela
 app.get('/users',(req, res)=>{
@@ -63,23 +90,63 @@ app.get('/users/:id', (req,res)=>{
     });
 });
 
-// Adicionando usuário na tabela
-app.get('/users/create', (req, res)=>{
-  res.render('newUsers',{
-    message: 'Criando um usuário'
-  });
-});
-
-app.post('/users/create',(req,res)=>{
-  User.create(req.body)
+//Uma forma de deletar
+app.post('/users/:id', (req,res)=>{
+  User.destroy({
+    where:{
+      id: req.params.id
+    }
+  })
     .then(()=>{
-      res.render('newUsers',{
-        message: 'Criando um usuário'
-      });
+      console.log("DELETANDO ID: ",req.params.id);
+      res.redirect('/users');
     })
     .catch((err)=>{
-      console.log("ERRO: ", err);
+      console.log("ERROR: ", err);
+    });
+});
+
+//Outra forma usando app.delete() do expressj
+app.delete('/users/:id', (req,res)=>{
+  User.destroy({
+    where:{
+      id: req.params.id
+    }
+  })
+    .then(()=>{
+      res.redirect('/users');
     })
+    .catch((err)=>{
+      console.log("ERROR: ", err);
+    });
+});
+
+//update
+app.get('/users/edit/:id', (req,res)=>{
+  User.findById(req.params.id)
+    .then((result)=>{
+      res.render('edit_users',{
+        message: 'Editando usuário',
+        data: result
+      })
+    })
+    .catch((err)=>{
+      console.log("ERROR: ", err);
+    });
+});
+
+app.post('/users/edit/:id',(req,res)=>{
+  User.update(req.body,{
+    where:{
+      id: req.params.id
+    }
+  })
+  .then((result)=>{
+    res.redirect('/users');
+  })
+  .catch((err)=>{
+    console.log("ERRO: ", err);
+  });
 });
 
 app.get('/', (req, res)=>{

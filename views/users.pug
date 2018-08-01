@@ -15,3 +15,8 @@ html
           tr
             td= obj.nome
             td= obj.sobrenome
+            td 
+              form(method="post", action="/users/"+obj.id)
+                input(type="hidden", name="_method", value="DELETE")
+                button(type="submit", value="Delete") Delete
+                
